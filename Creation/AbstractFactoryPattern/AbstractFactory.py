@@ -75,3 +75,11 @@ class LightUIFactory(UIFactory):
 
 
 if __name__ == "__main__":
+    light_factory = LightUIFactory()
+    light_btn = light_factory.getButton()
+    light_checkBx = light_factory.getCheckBox()
+    light_scrollBar = light_factory.getScrollBar()
+
+    light_btn.click()
+    light_checkBx.check()
+    light_scrollBar.scroll()
