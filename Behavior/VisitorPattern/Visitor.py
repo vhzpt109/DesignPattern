@@ -1,37 +1,42 @@
-class Visitor:
-    def visit(self, elem):
-        pass
+class AnimalVisitor:
+  def catVisit(self,elem):
+    pass
+  def dogVisit(self,elem):
+    pass
 
+class SpeakVisitor(AnimalVisitor):
+  def catVisit(self,elem):
+    print("meow~")
+  def dogVisit(self,elem):
+    print("bark!")
 
-class NameVisitor(Visitor):
-    def visit(self, elem):
-        print(elem.name)
+class NameVisitor(AnimalVisitor):
+  def catVisit(self,elem):
+    print(f"cat, {elem.name}")
+  def dogVisit(self,elem):
+    print(f"dog, {elem.name}")
 
+class Animal:
+  def __init__(self,name:str):
+    self.name = name
+  def accept(self,visitor:AnimalVisitor):
+    pass
 
-class AgeVisitor(Visitor):
-    def visit(self, elem):
-        print(elem.age)
+class Cat(Animal):
+  def accept(self,visitor:AnimalVisitor):
+    visitor.catVisit(self)
 
-
-class Cat:
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-
-    def speak(self):
-        print("meow")
-
-    def accept(self, visitor: Visitor):
-        print("use implementation of visitor")
-        visitor.visit(self)
+class Dog(Animal):
+  def accept(self,visitor:AnimalVisitor):
+    visitor.dogVisit(self)
 
 
 if __name__ == "__main__":
-    kitty = Cat("kitty", 3)
-    kitty.speak()
+    baduk = Dog('baduk')
+    kitty = Cat('kitty')
 
-    name_visitor = NameVisitor()
-    kitty.accept(name_visitor)
+    baduk.accept(NameVisitor())
+    kitty.accept(NameVisitor())
 
-    age_visitor = AgeVisitor()
-    kitty.accept(age_visitor)
+    baduk.accept(SpeakVisitor())
+    kitty.accept(SpeakVisitor())
