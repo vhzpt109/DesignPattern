@@ -1,66 +1,89 @@
-class Mediator:
-    def notify(sender):
+from __future__ import annotations
+from abc import ABC
+
+
+class Mediator(ABC):
+    """
+    The Mediator interface declares a method used by components to notify the
+    mediator about various events. The Mediator may react to these events and
+    pass the execution to other components.
+    """
+
+    def notify(self, sender: object, event: str) -> None:
         pass
 
 
-class Clock:
-    def setMediator(self, mediator: Mediator):
-        self.mediator = mediator
+class ConcreteMediator(Mediator):
+    def __init__(self, component1: Component1, component2: Component2) -> None:
+        self._component1 = component1
+        self._component1.mediator = self
+        self._component2 = component2
+        self._component2.mediator = self
 
-    def Alarm(self):
-        print("alarm on")
-        self.mediator.notify('AlarmOn')
-
-
-class Light:
-    def setMediator(self, mediator: Mediator):
-        self.mediator = mediator
-
-    def On(self):
-        print("light On")
-
-    def Off(self):
-        print("light off")
-        self.mediator.notify('LightOff')
+    def notify(self, sender: object, event: str) -> None:
+        if event == "A":
+            print("Mediator reacts on A and triggers following operations:")
+            self._component2.do_c()
+        elif event == "D":
+            print("Mediator reacts on D and triggers following operations:")
+            self._component1.do_b()
+            self._component2.do_c()
 
 
-class Speaker:
-    def setMediator(self, mediator: Mediator):
-        self.mediator = mediator
+class BaseComponent:
+    """
+    The Base Component provides the basic functionality of storing a mediator's
+    instance inside component objects.
+    """
 
-    def On(self):
-        print("speaker on")
+    def __init__(self, mediator: Mediator = None) -> None:
+        self._mediator = mediator
 
-    def Off(self):
-        print("speaker off")
+    @property
+    def mediator(self) -> Mediator:
+        return self._mediator
+
+    @mediator.setter
+    def mediator(self, mediator: Mediator) -> None:
+        self._mediator = mediator
 
 
-class HomeMediator(Mediator):
-    def __init__(self, clock, light, speaker):
-        self.clock = clock
-        self.light = light
-        self.speaker = speaker
+"""
+Concrete Components implement various functionality. They don't depend on other
+components. They also don't depend on any concrete mediator classes.
+"""
 
-    def notify(self, signal: str):
-        if signal == 'AlarmOn':
-            self.speaker.On()
-            self.light.On()
 
-        elif signal == 'LightOff':
-            self.speaker.Off()
+class Component1(BaseComponent):
+    def do_a(self) -> None:
+        print("Component 1 does A.")
+        self.mediator.notify(self, "A")
+
+    def do_b(self) -> None:
+        print("Component 1 does B.")
+        self.mediator.notify(self, "B")
+
+
+class Component2(BaseComponent):
+    def do_c(self) -> None:
+        print("Component 2 does C.")
+        self.mediator.notify(self, "C")
+
+    def do_d(self) -> None:
+        print("Component 2 does D.")
+        self.mediator.notify(self, "D")
 
 
 if __name__ == "__main__":
-    clock = Clock()
-    light = Light()
-    speaker = Speaker()
+    # The client code.
+    c1 = Component1()
+    c2 = Component2()
+    mediator = ConcreteMediator(c1, c2)
 
-    mediator = HomeMediator(clock, light, speaker)
+    print("Client triggers operation A.")
+    c1.do_a()
 
-    clock.setMediator(mediator)
-    light.setMediator(mediator)
-    speaker.setMediator(mediator)
+    print("\n", end="")
 
-    clock.Alarm()
-
-    light.Off()
+    print("Client triggers operation D.")
+    c2.do_d()
