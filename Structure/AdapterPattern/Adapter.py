@@ -1,42 +1,52 @@
-class Animal:  # interface class
-    def walk(self):
-        pass
+class Target:
+    """
+    The Target defines the domain-specific interface used by the client code.
+    """
+
+    def request(self) -> str:
+        return "Target: The default target's behavior."
 
 
-class Cat(Animal):
-    def walk(self):
-        print("cat walking")
+class Adaptee:
+    """
+    The Adaptee contains some useful behavior, but its interface is incompatible
+    with the existing client code. The Adaptee needs some adaptation before the
+    client code can use it.
+    """
+
+    def specific_request(self) -> str:
+        return ".eetpadA eht fo roivaheb laicepS"
 
 
-class Dog(Animal):
-    def walk(self):
-        print("dog walking")
+class Adapter(Target, Adaptee):
+    """
+    The Adapter makes the Adaptee's interface compatible with the Target's
+    interface via multiple inheritance.
+    """
 
-def makeWalk(animal: Animal):
-    animal.walk()
-
-
-class Fish:  # fish doesn't have a run method
-    def swim(self):
-        print("fish swimming")
+    def request(self) -> str:
+        return f"Adapter: (TRANSLATED) {self.specific_request()[::-1]}"
 
 
-class FishAdapter(Animal):
-    def __init__(self, fish: Fish):
-        self.fish = fish
+def client_code(target: "Target") -> None:
+    """
+    The client code supports all classes that follow the Target interface.
+    """
 
-    def walk(self):
-        self.fish.swim()
+    print(target.request(), end="")
 
 
 if __name__ == "__main__":
-    nemo = Fish()
+    print("Client: I can work just fine with the Target objects:")
+    target = Target()
+    client_code(target)
+    print("\n")
 
-    adapted_nemo = FishAdapter(nemo)
-    makeWalk(adapted_nemo)
+    adaptee = Adaptee()
+    print("Client: The Adaptee class has a weird interface. "
+          "See, I don't understand it:")
+    print(f"Adaptee: {adaptee.specific_request()}", end="\n\n")
 
-    kitty = Cat()
-    bingo = Dog()
-
-    makeWalk(kitty)
-    makeWalk(bingo)
+    print("Client: But I can work with it via the Adapter:")
+    adapter = Adapter()
+    client_code(adapter)
