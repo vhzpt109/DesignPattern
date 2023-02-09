@@ -1,47 +1,89 @@
-# implementor
-class Power:
-    def powerUp(self):
+from __future__ import annotations
+from abc import ABC, abstractmethod
+
+
+class Abstraction:
+    """
+    The Abstraction defines the interface for the "control" part of the two
+    class hierarchies. It maintains a reference to an object of the
+    Implementation hierarchy and delegates all of the real work to this object.
+    """
+
+    def __init__(self, implementation: Implementation) -> None:
+        self.implementation = implementation
+
+    def operation(self) -> str:
+        return (f"Abstraction: Base operation with:\n"
+                f"{self.implementation.operation_implementation()}")
+
+
+class ExtendedAbstraction(Abstraction):
+    """
+    You can extend the Abstraction without changing the Implementation classes.
+    """
+
+    def operation(self) -> str:
+        return (f"ExtendedAbstraction: Extended operation with:\n"
+                f"{self.implementation.operation_implementation()}")
+
+
+class Implementation(ABC):
+    """
+    The Implementation defines the interface for all implementation classes. It
+    doesn't have to match the Abstraction's interface. In fact, the two
+    interfaces can be entirely different. Typically the Implementation interface
+    provides only primitive operations, while the Abstraction defines higher-
+    level operations based on those primitives.
+    """
+
+    @abstractmethod
+    def operation_implementation(self) -> str:
         pass
 
-    def powerDown(self):
-        pass
+
+"""
+Each Concrete Implementation corresponds to a specific platform and implements
+the Implementation interface using that platform's API.
+"""
 
 
-class Engine(Power):
-    def powerUp(self):
-        print('engine power up')
-
-    def powerDown(self):
-        print('engine power down')
+class ConcreteImplementationA(Implementation):
+    def operation_implementation(self) -> str:
+        return "ConcreteImplementationA: Here's the result on the platform A."
 
 
-class Motor(Power):
-    def powerUp(self):
-        print('motor power up')
-
-    def powerDown(self):
-        print('motor power down')
+class ConcreteImplementationB(Implementation):
+    def operation_implementation(self) -> str:
+        return "ConcreteImplementationB: Here's the result on the platform B."
 
 
-# abstaction car
-class Car:
-    def __init__(self, power: Power):
-        self.power = power
+def client_code(abstraction: Abstraction) -> None:
+    """
+    Except for the initialization phase, where an Abstraction object gets linked
+    with a specific Implementation object, the client code should only depend on
+    the Abstraction class. This way the client code can support any abstraction-
+    implementation combination.
+    """
 
-    def drive(self):
-        self.power.powerUp()
+    # ...
 
-    def stop(self):
-        self.power.powerDown()
+    print(abstraction.operation(), end="")
 
-
-class Sedan(Car):
-    def sedanOnlyFn(self):
-        print('sedan only')
+    # ...
 
 
 if __name__ == "__main__":
-    sedan = Sedan(Motor())
-    sedan.drive()
-    sedan.stop()
-    sedan.sedanOnlyFn()
+    """
+    The client code should be able to work with any pre-configured abstraction-
+    implementation combination.
+    """
+
+    implementation = ConcreteImplementationA()
+    abstraction = Abstraction(implementation)
+    client_code(abstraction)
+
+    print("\n")
+
+    implementation = ConcreteImplementationB()
+    abstraction = ExtendedAbstraction(implementation)
+    client_code(abstraction)
